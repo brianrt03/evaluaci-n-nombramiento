@@ -1,37 +1,50 @@
 import streamlit as st
 import pandas as pd
-from io import BytesIO
+import requests
+from datetime import datetime
 
 # --- CONFIGURACIÓN DE LA PÁGINA ---
 st.set_page_config(page_title="Evaluación Nombramiento", layout="wide")
-
 st.title("🎓 Sistema de Evaluación para Nombramiento")
-st.markdown("Seleccione un colaborador para cargar sus criterios específicos.")
+st.markdown("Seleccione un colaborador de la lista para desplegar sus criterios de evaluación.")
+
+# --- TU URL DE CONEXIÓN (YA INTEGRADA) ---
+URL_WEBHOOK = "https://script.google.com/macros/s/AKfycbz8OmTf_FryvGNz6mIIBUyVzL8jkXXOBwlWXv4iKsjQji_hZDaUjLKYHQDV5GnA_HgN4g/exec"
 
 # --- CARGA DE DATOS ---
 @st.cache_data
 def cargar_datos():
-    # dtype=str asegura que leamos todo como texto para evitar errores de formato
-    df_n = pd.read_csv('nombrados.csv', dtype=str) 
-    df_f = pd.read_csv('funciones.csv', dtype=str)
-    return df_n, df_f
+    try:
+        # dtype=str es crucial para mantener ceros a la izquierda en IDs
+        df_n = pd.read_csv('nombrados.csv', dtype=str) 
+        df_f = pd.read_csv('funciones.csv', dtype=str)
+        return df_n, df_f
+    except FileNotFoundError:
+        return None, None
 
-try:
-    df_nombrados, df_funciones = cargar_datos()
+df_nombrados, df_funciones = cargar_datos()
 
-    # --- BARRA LATERAL (SELECTOR) ---
+if df_nombrados is None:
+    st.error("❌ Error Crítico: No se encuentran los archivos 'nombrados.csv' o 'funciones.csv' en el repositorio.")
+else:
+    # --- BARRA LATERAL (BUSCADOR) ---
     st.sidebar.header("🔍 Buscar Colaborador")
-    # Creamos un buscador amigable
-    lista_busqueda = df_nombrados['Nombre'] + " - (ID: " + df_nombrados['ID'] + ")"
-    seleccion = st.sidebar.selectbox("Escriba o seleccione:", lista_busqueda)
+    
+    # Creamos una lista amigable para buscar
+    if 'Nombre' in df_nombrados.columns and 'ID' in df_nombrados.columns:
+        lista_busqueda = df_nombrados['Nombre'] + " - (ID: " + df_nombrados['ID'] + ")"
+        seleccion = st.sidebar.selectbox("Escriba o seleccione:", lista_busqueda)
+    else:
+        st.error("El archivo 'nombrados.csv' no tiene las columnas 'Nombre' o 'ID'.")
+        seleccion = None
 
     # --- LÓGICA PRINCIPAL ---
     if seleccion:
-        # 1. Recuperar datos del colaborador
+        # 1. Recuperamos los datos de la persona
         nombre_real = seleccion.split(" - (ID:")[0]
         perfil = df_nombrados[df_nombrados['Nombre'] == nombre_real].iloc[0]
 
-        # 2. Mostrar Tarjeta de Datos
+        # 2. Tarjeta de Información Visual
         st.info(f"📂 **Evaluando a:** {perfil['Nombre']}")
         
         col1, col2, col3 = st.columns(3)
@@ -39,91 +52,74 @@ try:
         col1.write(f"**Categoría:** {perfil['Categoría']}")
         col2.write(f"**Unidad:** {perfil['Unidad']}")
         col2.write(f"**Sub Unidad:** {perfil['Sub Unidad']}")
-        col3.write(f"**Tipo de Unidad:** {perfil['Tipo de unidad']}")
+        col3.write(f"**Tipo Unidad:** {perfil['Tipo de unidad']}") # Asegúrate que tu CSV tenga esta columna exacta
         
         st.divider()
 
-        # 3. Filtrar Funciones (El Cruce Mágico)
+        # 3. Filtramos las funciones que le tocan
+        # ATENCIÓN: Verifica que los nombres de columnas coincidan con tu CSV (Mayúsculas/Minúsculas/Tildes)
         funciones_a_evaluar = df_funciones[
             (df_funciones['Categoria'] == perfil['Categoría']) & 
             (df_funciones['Tipo de unidad'] == perfil['Tipo de unidad'])
         ]
 
-        st.subheader("📋 Criterios de Evaluación")
-
         if funciones_a_evaluar.empty:
-            st.warning(f"⚠️ No hay funciones configuradas para: {perfil['Categoría']} - {perfil['Tipo de unidad']}")
+            st.warning(f"⚠️ No hay funciones configuradas para el perfil: {perfil['Categoría']} - {perfil['Tipo de unidad']}")
         else:
             with st.form("form_evaluacion"):
-                resultados_temp = [] 
+                st.subheader("📋 Criterios a Evaluar")
+                datos_para_enviar = []
                 
-                # --- AQUÍ ESTÁ EL CAMBIO IMPORTANTE ---
-                # Iteramos sobre cada función encontrada
+                # 4. Generamos las preguntas dinámicamente
                 for index, fila in funciones_a_evaluar.iterrows():
-                    st.write(f"🔹 **{fila['Funcion_Descripcion']}**")
+                    pregunta_texto = fila['Funcion_Descripcion']
+                    st.write(f"🔹 **{pregunta_texto}**")
                     
-                    # Leemos qué tipo de input pide el Excel
-                    tipo = str(fila['Tipo_Input']).strip().lower() # Convertimos a minúscula por si acaso
+                    # Detectamos qué tipo de respuesta pide el Excel (si_no, texto, numero)
+                    # Usamos .get() por si la columna no existe o está vacía
+                    tipo_input = str(fila.get('Tipo_Input', 'texto')).strip().lower()
                     
-                    respuesta = "" # Variable para guardar lo que escriban
+                    key_unico = f"resp_{perfil['ID']}_{index}"
 
-                    # DECISIÓN DINÁMICA DE WIDGET
-                    if tipo == 'si_no':
-                        respuesta = st.radio(
-                            "Seleccione una opción:",
-                            ["Sí", "No", "No Aplica"],
-                            key=f"input_{index}",
-                            horizontal=True
-                        )
-                    
-                    elif tipo == 'texto':
-                        respuesta = st.text_input(
-                            "Ingrese el detalle requerido:",
-                            key=f"input_{index}"
-                        )
-                    
-                    elif tipo == 'numero':
-                        respuesta = st.number_input(
-                            "Ingrese la cantidad:",
-                            min_value=0, 
-                            step=1,
-                            key=f"input_{index}"
-                        )
-                    
+                    if tipo_input == 'si_no':
+                        respuesta = st.radio("Seleccione:", ["Sí", "No", "No Aplica"], key=key_unico, horizontal=True)
+                    elif tipo_input == 'numero':
+                        respuesta = st.number_input("Ingrese cantidad:", min_value=0, step=1, key=key_unico)
                     else:
-                        # Si te olvidaste de poner el tipo en el Excel, pone texto por defecto
-                        respuesta = st.text_input("Respuesta:", key=f"input_{index}")
+                        respuesta = st.text_input("Respuesta:", key=key_unico)
 
-                    # Guardamos el resultado en la lista temporal
-                    resultados_temp.append({
-                        "ID": perfil['ID'],
-                        "Nombre": perfil['Nombre'],
-                        "Criterio": fila['Funcion_Descripcion'],
-                        "Respuesta": respuesta
+                    # Preparamos el paquete de datos para Google Sheets
+                    datos_para_enviar.append({
+                        "id": str(perfil['ID']),
+                        "nombre": str(perfil['Nombre']),
+                        "unidad": str(perfil['Unidad']),
+                        "pregunta": str(pregunta_texto),
+                        "respuesta": str(respuesta)
                     })
-                    st.markdown("---") 
+                    st.markdown("---")
                 
-                # Campo final de observaciones
                 observaciones = st.text_area("Observaciones Finales:")
-                boton_enviar = st.form_submit_button("✅ Finalizar Evaluación")
+                boton_enviar = st.form_submit_button("✅ Guardar Evaluación")
 
-            # 4. Generar Excel
+            # 5. Envío de datos a la Nube (Google Apps Script)
             if boton_enviar:
-                df_resultados = pd.DataFrame(resultados_temp)
-                df_resultados['Observaciones_Generales'] = observaciones
-                
-                # Generar descarga
-                buffer = BytesIO()
-                with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-                    df_resultados.to_excel(writer, index=False)
+                with st.spinner('Guardando en Google Sheets...'):
+                    errores = 0
+                    for paquete in datos_para_enviar:
+                        # Agregamos la observación general a cada fila
+                        paquete['observaciones'] = observaciones
+                        
+                        try:
+                            # Enviamos los datos a tu URL
+                            response = requests.post(URL_WEBHOOK, json=paquete)
+                            if response.status_code != 200:
+                                errores += 1
+                        except Exception as e:
+                            errores += 1
+                            st.error(f"Error de conexión: {e}")
                     
-                st.success("¡Datos capturados! Descarga el archivo abajo:")
-                st.download_button(
-                    label="📥 Descargar Excel de Resultados",
-                    data=buffer,
-                    file_name=f"Evaluacion_{perfil['ID']}.xlsx",
-                    mime="application/vnd.ms-excel"
-                )
-
-except Exception as e:
-    st.error(f"❌ Ocurrió un error: {e}. Revisa que tus archivos CSV tengan las columnas correctas.")
+                    if errores == 0:
+                        st.success("¡Evaluación guardada exitosamente en Google Sheets! 🎉")
+                        st.balloons()
+                    else:
+                        st.error(f"⚠️ Se guardaron parcialmente los datos. Hubo {errores} errores de conexión.")

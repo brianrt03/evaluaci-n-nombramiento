@@ -16,7 +16,7 @@ URL_WEBHOOK = "https://script.google.com/macros/s/AKfycbz8OmTf_FryvGNz6mIIBUyVzL
 def cargar_datos():
     try:
         # dtype=str es crucial para mantener ceros a la izquierda en IDs
-        df_n = pd.read_csv('nombrados.csv', dtype=str) 
+        df_n = pd.read_csv('postulantes.csv', dtype=str) 
         df_f = pd.read_csv('funciones.csv', dtype=str)
         return df_n, df_f
     except FileNotFoundError:

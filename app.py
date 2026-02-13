@@ -6,8 +6,8 @@ from datetime import datetime
 # --- CONFIGURACIÓN DE LA PÁGINA ---
 st.set_page_config(page_title="Gestión de Nombramientos", layout="wide")
 
-# --- TU URL DEL SCRIPT DE GOOGLE ---
-URL_WEBHOOK = "https://script.google.com/macros/s/AKfycby9NHgo7U4IUEyAjK0uD9KIAOdnQ0jUXLyi6ksYFul76CZFI7Yt7_lJlrFaLezTAvH1Tg/exec"
+# --- TU NUEVA URL (INTEGRADA) ---
+URL_WEBHOOK = "https://script.google.com/macros/s/AKfycbxQupYHGTRkYEQzxO3bsgMOGRxaHLyEFs_gRmlBzNet2O7ilB33v1ndKmJRQC9DcJNo0Q/exec"
 
 # --- FUNCIONES DE CARGA Y CONEXIÓN ---
 @st.cache_data
@@ -36,7 +36,7 @@ def cargar_datos_maestros():
         # --- ESTANDARIZACIÓN (MAPEO) ---
         df_f['Categoría'] = df_f['Categoría'].replace({'Tecnico': 'Técnico'})
         
-        # Mapeo para igualar nombres cortos a largos
+        # Mapeo para igualar nombres cortos a largos (Vital para los filtros)
         mapeo_largo = {
             'Subvencionada': 'UNIDADES SUBVENCIONADAS',
             'Autofinanciada': 'UNIDADES AUTOFINANCIADAS',
@@ -52,6 +52,7 @@ def cargar_datos_maestros():
         return None, None
 
 def obtener_ids_evaluados():
+    """Consulta a Google Sheets qué IDs ya están listos"""
     try:
         response = requests.get(URL_WEBHOOK)
         if response.status_code == 200:
@@ -73,7 +74,7 @@ if df_nombrados is not None:
     st.sidebar.header("🔍 Filtros de Búsqueda")
     
     # --- FILTRO 1: TIPO DE UNIDAD ---
-    # Obtenemos lista única de tipos
+    # Obtenemos lista única de tipos disponibles
     tipos_unicos = sorted(list(set(df_nombrados['Tipo de unidad'].dropna().astype(str).tolist())))
     lista_tipos = ["Todos"] + tipos_unicos
     filtro_tipo = st.sidebar.selectbox("1. Tipo de Unidad:", lista_tipos)
@@ -117,12 +118,12 @@ if df_nombrados is not None:
     
     if len(df_filtrado) > 0:
         progreso = len(df_listos) / len(df_filtrado)
-        st.progress(progreso, text=f"Avance: {int(progreso*100)}%")
+        st.progress(progreso, text=f"Avance del grupo filtrado: {int(progreso*100)}%")
     
     st.divider()
 
     # ==========================================
-    # 3. ZONA DE TRABAJO
+    # 3. ZONA DE TRABAJO (TABS)
     # ==========================================
     tab_pendientes, tab_historial = st.tabs(["⏳ Evaluar Pendientes", "📂 Historial Evaluados"])
 
@@ -145,7 +146,7 @@ if df_nombrados is not None:
                 # Tarjeta visual del empleado
                 st.info(f"**{perfil['Nombre']}** | {perfil['Categoría']} | {perfil['Unidad']}")
 
-                # Buscar funciones
+                # Buscar funciones (Usando el nombre largo normalizado)
                 funciones_persona = df_funciones[
                     (df_funciones['Categoría'] == perfil['Categoría']) & 
                     (df_funciones['Tipo de unidad'] == perfil['Tipo de unidad'])
@@ -155,7 +156,8 @@ if df_nombrados is not None:
                     st.warning(f"⚠️ No hay funciones para: {perfil['Categoría']} - {perfil['Tipo de unidad']}")
                 else:
                     with st.form("form_eval"):
-                        datos_para_enviar = []
+                        detalles_respuestas = [] # Lista para acumular respuestas
+                        
                         for idx, fila in funciones_persona.iterrows():
                             criterio = fila['Criterios']
                             tipo_input = str(fila.get('Tipo_Input', 'texto')).strip().lower()
@@ -163,7 +165,7 @@ if df_nombrados is not None:
                             st.write(f"🔹 {criterio}")
                             key_widget = f"preg_{perfil['ID']}_{idx}"
 
-                            # CAMBIO APLICADO: SOLO SI/NO
+                            # SOLO SI/NO (Eliminado "No Aplica")
                             if tipo_input == 'si_no':
                                 resp = st.radio("Cumple:", ["Sí", "No"], horizontal=True, key=key_widget)
                             elif tipo_input == 'numero':
@@ -171,31 +173,38 @@ if df_nombrados is not None:
                             else:
                                 resp = st.text_input("Respuesta:", key=key_widget)
                             
-                            datos_para_enviar.append({
-                                "id": str(perfil['ID']), "nombre": str(perfil['Nombre']),
-                                "unidad": str(perfil['Unidad']), "pregunta": str(criterio),
+                            # Guardamos en la lista temporal
+                            detalles_respuestas.append({
+                                "pregunta": str(criterio),
                                 "respuesta": str(resp)
                             })
                             st.markdown("---")
                         
-                        obs = st.text_area("Observaciones:")
+                        obs = st.text_area("Observaciones Finales:")
                         
-                        if st.form_submit_button("💾 Guardar Evaluación"):
-                            with st.spinner("Enviando..."):
-                                errores = 0
-                                for paquete in datos_para_enviar:
-                                    paquete['observaciones'] = obs
-                                    try:
-                                        res = requests.post(URL_WEBHOOK, json=paquete)
-                                        if res.status_code != 200: errores += 1
-                                    except: errores += 1
-                                
-                                if errores == 0:
-                                    st.success("✅ ¡Guardado!")
-                                    st.cache_data.clear()
-                                    st.rerun()
-                                else:
-                                    st.error("⚠️ Error de conexión.")
+                        if st.form_submit_button("💾 Guardar Evaluación Completa"):
+                            # Preparamos EL PAQUETE ÚNICO (JSON GRANDE)
+                            payload_completo = {
+                                "id": str(perfil['ID']),
+                                "nombre": str(perfil['Nombre']),
+                                "unidad": str(perfil['Unidad']),
+                                "categoria": str(perfil['Categoría']),
+                                "tipo_unidad": str(perfil['Tipo de unidad']),
+                                "observaciones": obs,
+                                "detalles": detalles_respuestas # Array con todas las preguntas
+                            }
+                            
+                            with st.spinner("Guardando registro único..."):
+                                try:
+                                    res = requests.post(URL_WEBHOOK, json=payload_completo)
+                                    if res.status_code == 200:
+                                        st.success("✅ ¡Registro guardado correctamente!")
+                                        st.cache_data.clear() # Limpiamos caché para actualizar listas
+                                        st.rerun() # Recargamos la página
+                                    else:
+                                        st.error(f"Error del servidor: {res.status_code}")
+                                except Exception as e:
+                                    st.error(f"Error de conexión: {e}")
 
     # --- PESTAÑA B: HISTORIAL ---
     with tab_historial:

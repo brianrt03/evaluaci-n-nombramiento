@@ -1,0 +1,59 @@
+﻿Categoria laboral ;Tipo de unidad;Criterios;Tipo_Input
+Directivo ;FACULTADES Y DEPARTAMENTOS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
+Directivo ;UNIDADES SUBVENCIONADAS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
+Directivo ;UNIDADES AUTOFINANCIADAS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
+Directivo ;UNIDADES AUTOFINANCIADAS;Posiciones con impacto directo en los resultados que contribuyan en la generación de ingresos respaldado con cumplimiento de metas en los últimos 3 años.;si_no
+Jefe;FACULTADES Y DEPARTAMENTOS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
+Jefe;UNIDADES SUBVENCIONADAS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
+Jefe;UNIDADES AUTOFINANCIADAS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
+Jefe;UNIDADES AUTOFINANCIADAS;Posiciones con impacto directo en los resultados que contribuyan en la generación de ingresos respaldado con cumplimiento de metas en los últimos 3 años.;si_no
+Experto;FACULTADES Y DEPARTAMENTOS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
+Experto;FACULTADES Y DEPARTAMENTOS;Posiciones que estén alineadas al análisis de estructura mínima y la atención de procesos críticos de la facultad/departamento;si_no
+Experto;FACULTADES Y DEPARTAMENTOS;Posiciones que garanticen la atención y la integridad de los usuarios de laboratorios y talleres;si_no
+Experto;UNIDADES SUBVENCIONADAS; Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
+Experto;UNIDADES SUBVENCIONADAS;Posiciones que lideren los procesos y servicios a la academia, la investigación y la administración central.;si_no
+Experto;UNIDADES SUBVENCIONADAS;Posición a la que reporte el caso evaluado;texto
+Experto;UNIDADES SUBVENCIONADAS;Cantidad de trabajadores permanentes en la estructura;numero
+Experto;UNIDADES SUBVENCIONADAS;Cantidad de pares;numero
+Experto;UNIDADES AUTOFINANCIADAS;Posiciones que lideren procesos o servicios que contribuyan de forma directa en la generación de ingresos, respaldado con cumplimiento de metas en los últimos 3 años.;si_no
+Experto;UNIDADES AUTOFINANCIADAS;Posiciones de venta o comerciales cuya contribución o cartea de clientes tenga un alto impacto en la generación de ingresos.;si_no
+Experto;UNIDADES AUTOFINANCIADAS;Para las oposiciones de ventas se revisara el HC de personal permanente y cantidad de pares en carteras similares.;numero
+Ejecutivo;FACULTADES Y DEPARTAMENTOS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
+Ejecutivo;FACULTADES Y DEPARTAMENTOS; Posiciones que estén alineadas al análisis de estructura mínima y la atención de procesos críticos de la facultad/departamento;si_no
+Ejecutivo;FACULTADES Y DEPARTAMENTOS;Posiciones que garanticen la atención y la integridad de los usuarios de laboratorios y talleres;si_no
+Ejecutivo;UNIDADES SUBVENCIONADAS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
+Ejecutivo;UNIDADES SUBVENCIONADAS;Posiciones que lideren los procesos y servicios a la academia, la investigación y la administración central.;si_no
+Ejecutivo;UNIDADES SUBVENCIONADAS;Posición a la que reporte el caso evaluado.;texto
+Ejecutivo;UNIDADES SUBVENCIONADAS;Cantidad de trabajadores permanentes en la estructura.;numero
+Ejecutivo;UNIDADES SUBVENCIONADAS;Cantidad de pares;numero
+Ejecutivo;UNIDADES AUTOFINANCIADAS;Posiciones que lideren procesos o servicios que contribuyan de forma directa en la generación de ingresos, respaldado con cumplimiento de metas en los últimos 3 años.;si_no
+Ejecutivo;UNIDADES AUTOFINANCIADAS; Posiciones de venta o comerciales cuya contribución o cartea de clientes tenga un alto impacto en la generación de ingresos.;si_no
+Ejecutivo;UNIDADES AUTOFINANCIADAS;Para las oposiciones de ventas se revisara el HC de personal permanente y cantidad de pares en carteras similares.;texto
+Asistente;FACULTADES Y DEPARTAMENTOS;Posiciones que están alineadas al análisis de estructura minina y la atención de procesos críticos de una facultad/departamento.;si_no
+Asistente;FACULTADES Y DEPARTAMENTOS;Posiciones que garanticen la atención y la integridad de los usuarios de laboratorios y talleres.;si_no
+Asistente;FACULTADES Y DEPARTAMENTOS;Cantidad de pares y responsables del proceso principal asociado a la posición.;numero
+Asistente;FACULTADES Y DEPARTAMENTOS;Proyección de posición y de la persona para realizar nuevos encargos en el futuro.;texto
+Asistente;UNIDADES SUBVENCIONADAS;Posiciones que atiendan procesos y servicios de alto impacto o claves para la unidad y la institución.;si_no
+Asistente;UNIDADES SUBVENCIONADAS;Cantidad de trabajadores permanentes en la estructura.;numero
+Asistente;UNIDADES SUBVENCIONADAS;Cantidad de pares y responsables del proceso principal asociado a la posición.;numero
+Asistente;UNIDADES SUBVENCIONADAS;Se revisara su la posición tiene un perfil especializado técnico o tecnológico.;texto
+Asistente;UNIDADES AUTOFINANCIADAS;Cantidad de trabajadores permanentes en la estructura.;numero
+Asistente;UNIDADES AUTOFINANCIADAS;Cantidad de pares y responsable del proceso principal asociado a la posición.;numero
+Tecnico;FACULTADES Y DEPARTAMENTOS;Posiciones que garanticen la atención de alumnos y docentes y la integridad de los usuarios de laboratorio y talleres.;si_no
+Tecnico;FACULTADES Y DEPARTAMENTOS;Cantidad de pares realizando el proceso.;numero
+Tecnico;FACULTADES Y DEPARTAMENTOS;Se revisara si el puesto es técnico especializado.;texto
+Tecnico;UNIDADES SUBVENCIONADAS;Posiciones altamente especializadas que atiendan procesos operativos y que permitan el nombrar funcionamiento de las actividades de la unidad.;si_no
+Tecnico;UNIDADES SUBVENCIONADAS;Cantidad de pares realizando el proceso.;numero
+Tecnico;UNIDADES SUBVENCIONADAS;Cantidad de trabajadores permanente en la estructura.;numero
+Tecnico;UNIDADES AUTOFINANCIADAS;Posiciones altamente especializadas que atiendan procesos operativos y que permitan el nombrar funcionamiento de las actividades de la unidad. Resultados de los 3 últimos años;si_no
+Tecnico;UNIDADES AUTOFINANCIADAS;Cantidad de pares.;numero
+Tecnico;UNIDADES AUTOFINANCIADAS;Relevancia del puesto operativo en el servicio que brinda a unidad (nivel de especialización de las funciones).;texto
+Auxiliar;FACULTADES Y DEPARTAMENTOS;Posiciones que garanticen la atención de alumnos y docentes y la integridad de los usuarios de laboratorio y talleres.;si_no
+Auxiliar;FACULTADES Y DEPARTAMENTOS;Cantidad de pares realizando el proceso.;numero
+Auxiliar;FACULTADES Y DEPARTAMENTOS;Se revisara si el puesto es técnico especializado.;texto
+Auxiliar;UNIDADES SUBVENCIONADAS;Posiciones altamente especializadas que atiendan procesos operativos y que permitan el nombrar funcionamiento de las actividades de la unidad.;si_no
+Auxiliar;UNIDADES SUBVENCIONADAS;Cantidad de pares.;numero
+Auxiliar;UNIDADES SUBVENCIONADAS;Cantidad de trabajadores permanente en la estructura.;numero
+Auxiliar;UNIDADES AUTOFINANCIADAS;Posiciones altamente especializadas que atiendan procesos operativos y que permitan el nombrar funcionamiento de las actividades de la unidad. Resultados de los 3 últimos años;si_no
+Auxiliar;UNIDADES AUTOFINANCIADAS;Cantidad de pares;numero
+Auxiliar;UNIDADES AUTOFINANCIADAS;Relevancia del puesto operativo en el servicio que brinda a unidad (nivel de especialización de las funciones).;texto

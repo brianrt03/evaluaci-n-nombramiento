@@ -14,9 +14,8 @@ URL_WEBHOOK = "https://script.google.com/macros/s/AKfycby9NHgo7U4IUEyAjK0uD9KIAO
 def cargar_datos_maestros():
     """Carga y limpia los archivos CSV locales"""
     try:
-        # 1. Cargar Postulantes
+        # 1. Cargar CSVs
         df_n = pd.read_csv('postulantes.csv', dtype=str)
-        # 2. Cargar Funciones
         df_f = pd.read_csv('funciones.csv', sep=';', dtype=str)
         
         # --- LIMPIEZA DE COLUMNAS ---
@@ -34,23 +33,17 @@ def cargar_datos_maestros():
             if col in df_f.columns: 
                 df_f[col] = df_f[col].astype(str).str.strip()
 
-        # --- ESTANDARIZACIÓN ---
+        # --- ESTANDARIZACIÓN (MAPEO) ---
         df_f['Categoría'] = df_f['Categoría'].replace({'Tecnico': 'Técnico'})
         
-        # AQUI ESTA EL CAMBIO DEL FILTRO:
-        # Mapeamos los nombres cortos del Excel de personas a los nombres LARGOS de funciones
-        # Así aparecerá "FACULTADES Y DEPARTAMENTOS" en el filtro
+        # Mapeo para igualar nombres cortos a largos
         mapeo_largo = {
             'Subvencionada': 'UNIDADES SUBVENCIONADAS',
             'Autofinanciada': 'UNIDADES AUTOFINANCIADAS',
             'Facultad': 'FACULTADES Y DEPARTAMENTOS',
             'FACULTAD': 'FACULTADES Y DEPARTAMENTOS'
         }
-        # Aplicamos el cambio al archivo de PERSONAS (df_n)
         df_n['Tipo de unidad'] = df_n['Tipo de unidad'].replace(mapeo_largo)
-        
-        # Aseguramos que el archivo de FUNCIONES (df_f) también use los nombres largos
-        # (Por si acaso ya venían cortos)
         df_f['Tipo de unidad'] = df_f['Tipo de unidad'].replace(mapeo_largo)
         
         return df_n, df_f
@@ -75,45 +68,50 @@ if df_nombrados is not None:
     st.title("📊 Dashboard de Evaluación de Nombramiento")
 
     # ==========================================
-    # 1. BARRA LATERAL (FILTROS)
+    # 1. BARRA LATERAL (FILTROS EN CASCADA)
     # ==========================================
     st.sidebar.header("🔍 Filtros de Búsqueda")
     
-    try:
-        # Filtro Unidad
-        unidades_unicas = sorted(list(set(df_nombrados['Unidad'].dropna().astype(str).tolist())))
-        lista_unidades = ["Todas"] + unidades_unicas
-        filtro_unidad = st.sidebar.selectbox("Filtrar por Unidad:", lista_unidades)
-        
-        # Filtro Tipo de Unidad
-        tipos_unicos = sorted(list(set(df_nombrados['Tipo de unidad'].dropna().astype(str).tolist())))
-        lista_tipos = ["Todos"] + tipos_unicos
-        filtro_tipo = st.sidebar.selectbox("Filtrar por Tipo de Unidad:", lista_tipos)
-    except Exception as e:
-        st.error(f"Error filtros: {e}")
-        filtro_unidad = "Todas"
-        filtro_tipo = "Todos"
+    # --- FILTRO 1: TIPO DE UNIDAD ---
+    # Obtenemos lista única de tipos
+    tipos_unicos = sorted(list(set(df_nombrados['Tipo de unidad'].dropna().astype(str).tolist())))
+    lista_tipos = ["Todos"] + tipos_unicos
+    filtro_tipo = st.sidebar.selectbox("1. Tipo de Unidad:", lista_tipos)
 
-    # Aplicar filtros
+    # --- LÓGICA DE CASCADA PARA EL FILTRO 2 ---
+    # Creamos un dataframe temporal solo para calcular qué unidades mostrar
+    df_para_unidades = df_nombrados.copy()
+    
+    if filtro_tipo != "Todos":
+        # Si seleccionaron un Tipo, filtramos las unidades disponibles
+        df_para_unidades = df_para_unidades[df_para_unidades['Tipo de unidad'] == filtro_tipo]
+    
+    # --- FILTRO 2: UNIDAD (CONDICIONADO) ---
+    unidades_disponibles = sorted(list(set(df_para_unidades['Unidad'].dropna().astype(str).tolist())))
+    lista_unidades = ["Todas"] + unidades_disponibles
+    filtro_unidad = st.sidebar.selectbox("2. Unidad:", lista_unidades)
+
+    # --- APLICACIÓN FINAL DE FILTROS AL DATASET ---
     df_filtrado = df_nombrados.copy()
-    if filtro_unidad != "Todas":
-        df_filtrado = df_filtrado[df_filtrado['Unidad'] == filtro_unidad]
+    
+    # Aplicamos filtro 1
     if filtro_tipo != "Todos":
         df_filtrado = df_filtrado[df_filtrado['Tipo de unidad'] == filtro_tipo]
+    
+    # Aplicamos filtro 2
+    if filtro_unidad != "Todas":
+        df_filtrado = df_filtrado[df_filtrado['Unidad'] == filtro_unidad]
 
     # ==========================================
-    # 2. LÓGICA DE ESTADO
+    # 2. ESTADO Y KPIs
     # ==========================================
     df_filtrado['Estado'] = df_filtrado['ID'].apply(lambda x: '✅ Listo' if str(x) in ids_ya_evaluados else '⏳ Pendiente')
     
     df_pendientes = df_filtrado[df_filtrado['Estado'] == '⏳ Pendiente']
     df_listos = df_filtrado[df_filtrado['Estado'] == '✅ Listo']
 
-    # ==========================================
-    # 3. KPIs
-    # ==========================================
     col1, col2, col3 = st.columns(3)
-    col1.metric("👥 Total Filtrado", len(df_filtrado))
+    col1.metric("👥 Personas Filtradas", len(df_filtrado))
     col2.metric("📝 Pendientes", len(df_pendientes))
     col3.metric("✅ Evaluados", len(df_listos))
     
@@ -124,32 +122,37 @@ if df_nombrados is not None:
     st.divider()
 
     # ==========================================
-    # 4. PESTAÑAS
+    # 3. ZONA DE TRABAJO
     # ==========================================
-    tab_pendientes, tab_historial = st.tabs(["⏳ Lista de Pendientes", "📂 Historial"])
+    tab_pendientes, tab_historial = st.tabs(["⏳ Evaluar Pendientes", "📂 Historial Evaluados"])
 
-    # --- PESTAÑA A: PENDIENTES ---
+    # --- PESTAÑA A: EVALUACIÓN ---
     with tab_pendientes:
         if df_pendientes.empty:
-            st.success("🎉 ¡No hay pendientes con estos filtros!")
+            st.success("🎉 ¡No hay personas pendientes con los filtros seleccionados!")
         else:
-            lista_para_selector = df_pendientes['Nombre'] + " - (ID: " + df_pendientes['ID'] + ")"
-            seleccion = st.selectbox("Seleccione colaborador:", lista_para_selector)
+            # --- FILTRO 3: NOMBRE (CONDICIONADO POR LOS ANTERIORES) ---
+            st.markdown("##### 3. Seleccione al Colaborador:")
+            
+            # La lista ya viene filtrada por Tipo y Unidad gracias a la lógica de arriba
+            lista_nombres = df_pendientes['Nombre'] + " - (ID: " + df_pendientes['ID'] + ")"
+            seleccion = st.selectbox("Buscar por nombre:", lista_nombres, label_visibility="collapsed")
             
             if seleccion:
                 id_seleccionado = seleccion.split(" - (ID: ")[1][:-1]
                 perfil = df_nombrados[df_nombrados['ID'] == id_seleccionado].iloc[0]
 
-                st.markdown(f"**Evaluando a:** {perfil['Nombre']} | **Unidad:** {perfil['Unidad']}")
+                # Tarjeta visual del empleado
+                st.info(f"**{perfil['Nombre']}** | {perfil['Categoría']} | {perfil['Unidad']}")
 
-                # Buscar funciones (Usando el nombre largo normalizado)
+                # Buscar funciones
                 funciones_persona = df_funciones[
                     (df_funciones['Categoría'] == perfil['Categoría']) & 
                     (df_funciones['Tipo de unidad'] == perfil['Tipo de unidad'])
                 ]
 
                 if funciones_persona.empty:
-                    st.warning(f"⚠️ No hay funciones para: {perfil['Categoría']} - {perfil['Tipo de unidad']}. (Revisa que coincidan los nombres)")
+                    st.warning(f"⚠️ No hay funciones para: {perfil['Categoría']} - {perfil['Tipo de unidad']}")
                 else:
                     with st.form("form_eval"):
                         datos_para_enviar = []
@@ -160,7 +163,7 @@ if df_nombrados is not None:
                             st.write(f"🔹 {criterio}")
                             key_widget = f"preg_{perfil['ID']}_{idx}"
 
-                            # CAMBIO REALIZADO: Solo Sí y No
+                            # CAMBIO APLICADO: SOLO SI/NO
                             if tipo_input == 'si_no':
                                 resp = st.radio("Cumple:", ["Sí", "No"], horizontal=True, key=key_widget)
                             elif tipo_input == 'numero':
@@ -177,7 +180,7 @@ if df_nombrados is not None:
                         
                         obs = st.text_area("Observaciones:")
                         
-                        if st.form_submit_button("💾 Guardar"):
+                        if st.form_submit_button("💾 Guardar Evaluación"):
                             with st.spinner("Enviando..."):
                                 errores = 0
                                 for paquete in datos_para_enviar:
@@ -190,13 +193,13 @@ if df_nombrados is not None:
                                 if errores == 0:
                                     st.success("✅ ¡Guardado!")
                                     st.cache_data.clear()
-                                    st.rerun() # Recarga automática
+                                    st.rerun()
                                 else:
                                     st.error("⚠️ Error de conexión.")
 
     # --- PESTAÑA B: HISTORIAL ---
     with tab_historial:
         if df_listos.empty:
-            st.info("Sin evaluaciones completadas.")
+            st.info("Sin evaluaciones completadas para este filtro.")
         else:
             st.dataframe(df_listos[['ID', 'Nombre', 'Unidad', 'Categoría', 'Tipo de unidad']], use_container_width=True, hide_index=True)

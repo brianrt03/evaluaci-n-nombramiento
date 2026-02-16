@@ -41,12 +41,8 @@ def cargar_datos_maestros():
         mapeo_largo = {
             'Subvencionada': 'UNIDADES SUBVENCIONADAS',
             'Autofinanciada': 'UNIDADES AUTOFINANCIADAS',
-            'Facultad': 'FACULTADES Y DEPARTAMENTOS',
-            'FACULTAD': 'FACULTADES Y DEPARTAMENTOS',
-            'Facultades': 'FACULTADES Y DEPARTAMENTOS',
-            'FACULTADES': 'FACULTADES Y DEPARTAMENTOS',
-            'Departamento': 'FACULTADES Y DEPARTAMENTOS',
-            'DEPARTAMENTO': 'FACULTADES Y DEPARTAMENTOS'
+            'Facultad y departamentos': 'FACULTADES Y DEPARTAMENTOS',
+
         }
         
         # Aplicamos el mapeo (si no encuentra la clave, deja el valor original)

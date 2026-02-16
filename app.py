@@ -41,7 +41,7 @@ def cargar_datos_maestros():
         mapeo_largo = {
             'Subvencionada': 'UNIDADES SUBVENCIONADAS',
             'Autofinanciada': 'UNIDADES AUTOFINANCIADAS',
-            'Facultad y departamentos': 'FACULTADES Y DEPARTAMENTOS',
+            'Facultades y departamentos': 'FACULTADES Y DEPARTAMENTOS',
 
         }
         

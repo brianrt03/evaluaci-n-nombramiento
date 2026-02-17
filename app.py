@@ -7,7 +7,7 @@ from datetime import datetime
 st.set_page_config(page_title="Gestión de Nombramientos", layout="wide")
 
 # --- TU URL (MANTENEMOS LA MISMA) ---
-URL_WEBHOOK = "https://script.google.com/macros/s/AKfycbxQupYHGTRkYEQzxO3bsgMOGRxaHLyEFs_gRmlBzNet2O7ilB33v1ndKmJRQC9DcJNo0Q/exec"
+URL_WEBHOOK = "https://script.google.com/macros/s/AKfycbxllDWg0YLuNmfDnNf4aA6XCZWii5M1iCXcGGoPOCnpVFKx1t12d4zSSW81mpPuqhXdxQ/exec"
 
 # --- FUNCIONES DE CARGA Y CONEXIÓN ---
 @st.cache_data

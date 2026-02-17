@@ -26,7 +26,7 @@ def cargar_datos_maestros():
             df_f.rename(columns={'Categoria laboral': 'Categoría'}, inplace=True)
             
         # --- LIMPIEZA DE VALORES ---
-        for col in ['Categoría', 'Tipo de unidad', 'Unidad', 'Nombre', 'ID']:
+        for col in ['Categoría', 'Tipo de unidad', 'Unidad', 'Nombre', 'ID', 'Posición']:
             if col in df_n.columns: 
                 df_n[col] = df_n[col].astype(str).str.strip()
                 df_n[col] = df_n[col].replace('nan', 'SIN DATOS')
@@ -134,7 +134,7 @@ if df_nombrados is not None:
                 id_seleccionado = seleccion.split(" - (ID: ")[1][:-1]
                 perfil = df_nombrados[df_nombrados['ID'] == id_seleccionado].iloc[0]
 
-                st.info(f"**{perfil['Nombre']}** | {perfil['Categoría']} | {perfil['Unidad']}")
+                st.info(f"**{perfil['Nombre']}** | {perfil['Categoría']} | {perfil['Posición']} | {perfil['Unidad']}")
 
                 funciones_persona = df_funciones[
                     (df_funciones['Categoría'] == perfil['Categoría']) & 

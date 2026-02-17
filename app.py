@@ -179,6 +179,7 @@ if df_nombrados is not None:
                                 "nombre": str(perfil['Nombre']),
                                 "unidad": str(perfil['Unidad']),
                                 "categoria": str(perfil['Categoría']),
+                                "posición": str(perfil['Posición']),
                                 "tipo_unidad": str(perfil['Tipo de unidad']),
                                 "observaciones": obs,
                                 "detalles": detalles_respuestas 

@@ -2,11 +2,11 @@
 Directivo ;FACULTADES Y DEPARTAMENTOS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
 Directivo ;UNIDADES SUBVENCIONADAS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
 Directivo ;UNIDADES AUTOFINANCIADAS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
-Directivo ;UNIDADES AUTOFINANCIADAS;Posiciones con impacto directo en los resultados que contribuyan en la generación de ingresos respaldado con cumplimiento de metas en los últimos 3 años.;si_no
+Directivo ;UNIDADES AUTOFINANCIADAS;Posiciones con impacto directo en los resultados que contribuyan en la generación de ingresos.;si_no
 Jefe;FACULTADES Y DEPARTAMENTOS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
 Jefe;UNIDADES SUBVENCIONADAS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
 Jefe;UNIDADES AUTOFINANCIADAS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
-Jefe;UNIDADES AUTOFINANCIADAS;Posiciones con impacto directo en los resultados que contribuyan en la generación de ingresos respaldado con cumplimiento de metas en los últimos 3 años.;si_no
+Jefe;UNIDADES AUTOFINANCIADAS;Posiciones con impacto directo en los resultados que contribuyan en la generación de ingresos.;si_no
 Experto;FACULTADES Y DEPARTAMENTOS;Posiciones estratégicas que responden a necesidades prioritarias e institucionales;si_no
 Experto;FACULTADES Y DEPARTAMENTOS;Posiciones que estén alineadas al análisis de estructura mínima y la atención de procesos críticos de la facultad/departamento;si_no
 Experto;FACULTADES Y DEPARTAMENTOS;Posiciones que garanticen la atención y la integridad de los usuarios de laboratorios y talleres;si_no
@@ -22,7 +22,7 @@ Ejecutivo;UNIDADES SUBVENCIONADAS;Posiciones estratégicas que responden a neces
 Ejecutivo;UNIDADES SUBVENCIONADAS;Posiciones que lideren los procesos y servicios a la academia, la investigación y la administración central.;si_no
 Ejecutivo;UNIDADES SUBVENCIONADAS;Posición a la que reporte el caso evaluado.;texto
 Ejecutivo;UNIDADES SUBVENCIONADAS;Cantidad de trabajadores permanentes en la estructura.;numero
-Ejecutivo;UNIDADES AUTOFINANCIADAS;Posiciones que lideren procesos o servicios que contribuyan de forma directa en la generación de ingresos, respaldado con cumplimiento de metas en los últimos 3 años.;si_no
+Ejecutivo;UNIDADES AUTOFINANCIADAS;Posiciones que lideren procesos o servicios que contribuyan de forma directa en la generación de ingresos.;si_no
 Analista;FACULTADES Y DEPARTAMENTOS;Posiciones que están alineadas al análisis de estructura minina y la atención de procesos críticos de una facultad/departamento.;si_no
 Analista;FACULTADES Y DEPARTAMENTOS;Posiciones que garanticen la atención y la integridad de los usuarios de laboratorios y talleres.;si_no
 Analista;UNIDADES SUBVENCIONADAS;Posiciones que atiendan procesos y servicios de alto impacto o claves para la unidad y la institución.;si_no
@@ -40,4 +40,5 @@ Auxiliar;FACULTADES Y DEPARTAMENTOS;Posiciones que garanticen la atención de al
 Auxiliar;FACULTADES Y DEPARTAMENTOS;Se revisara si el puesto es técnico especializado.;texto
 Auxiliar;UNIDADES SUBVENCIONADAS;Cantidad de trabajadores permanente en la estructura.;numero
 Auxiliar;UNIDADES AUTOFINANCIADAS;Relevancia del puesto operativo en el servicio que brinda a unidad (nivel de especialización de las funciones).;texto
+
 
